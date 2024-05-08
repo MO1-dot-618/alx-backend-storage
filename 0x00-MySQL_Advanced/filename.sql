@@ -1,0 +1,1 @@
+<html><body>You are being <a href="https://intranet.alxswe.com/auth/sign_in">redirected</a>.</body></html>
