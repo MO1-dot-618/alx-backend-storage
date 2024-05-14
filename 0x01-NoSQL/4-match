@@ -1,2 +1,2 @@
 // find haha
-db.school.find({ name: "Holberton school" }i)
+db.school.find({ name: "Holberton school" })
