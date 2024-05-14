@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 Module: 8-all.py
 """
