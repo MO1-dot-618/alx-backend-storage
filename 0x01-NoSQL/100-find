@@ -1,0 +1,2 @@
+// made of coke
+db.school.find({ name: { $regex: /^Holberton/ } })
