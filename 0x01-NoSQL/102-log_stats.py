@@ -44,9 +44,9 @@ def log_stats():
         print(f"\tmethod {method}: {method_counts[method]}")
     print(f"{status_check_count} status check")
 
-    print("Top 10 most present IPs:")
+    print("IPs:")
     for idx, ip_info in enumerate(top_ips, 1):
-        print(f"\t{idx}. IP: {ip_info['_id']}, Count: {ip_info['count']}")
+        print(f"\t{ip_info['_id']}: {ip_info['count']}")
 
 if __name__ == "__main__":
     log_stats()
