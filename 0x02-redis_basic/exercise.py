@@ -8,6 +8,7 @@ import uuid
 from typing import Union, Callable, Optional, Any
 from functools import wraps
 
+
 def replay(method: Callable) -> None:
     """
     Displays the history of calls of a particular function
@@ -33,6 +34,7 @@ def count_calls(method: Callable) -> Callable:
 
     return wrapper
 
+
 def call_history(method: Callable) -> Callable:
     '''
         stores the history of inputs and outputs for a particular function
@@ -51,6 +53,7 @@ def call_history(method: Callable) -> Callable:
 
     return wrapper
 
+
 class Cache:
     """A class to manage caching using Redis."""
 
@@ -58,7 +61,7 @@ class Cache:
         """Initialize the Cache instance and connect to Redis."""
         self._redis = redis.Redis()
         self._redis.flushdb()
-    
+
     def store(self, data: Union[str, bytes, int, float]) -> str:
         """Store data in the cache.
 
@@ -72,12 +75,14 @@ class Cache:
         self._redis.set(key, data)
         return (key)
 
-    def get(self, key: str, fn: Callable = None) -> Union[str, bytes, int, float, None]:
+    def get(self, key: str, fn: Callable = None) -> \
+            Union[str, bytes, int, float, None]:
         """Retrieve data from the cache.
 
         Args:
             key (str): The key under which the data is stored.
-            fn (Callable, optional): A callable function to convert the data back to the desired format.
+            fn (Callable, optional): A callable function to convert
+            the data back to the desired format.
 
         Returns:
             Union[str, bytes, int, float, None]: The retrieved data.
@@ -108,4 +113,3 @@ class Cache:
             Union[int, None]: The retrieved integer data.
         """
         return self.get(key, fn=int)
-
