@@ -26,8 +26,5 @@ class Cache:
             str: The key under which the data is stored in the cache.
         """
         key = str(uuid.uuid4())
-        value = {
-            'data': data
-        }
-        self._redis.hmset(key, value)
+        self._redis.set(key, data)
         return (key)
