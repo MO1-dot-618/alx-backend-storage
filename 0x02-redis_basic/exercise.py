@@ -5,8 +5,51 @@ This module provides a Cache class for managing caching using Redis.
 
 import redis
 import uuid
-from typing import Union, Callable
+from typing import Union, Callable, Optional, Any
+from functools import wraps
 
+def replay(method: Callable) -> None:
+    """
+    Displays the history of calls of a particular function
+    """
+    name = method.__qualname__
+    client = redis.Redis()
+    inputs = client.lrange("{}:inputs".format(name), 0, -1)
+    outputs = client.lrange("{}:outputs".format(name), 0, -1)
+    print('{} was called {} times:'.format(name, len(inputs)))
+    for input, output in zip(inputs, outputs):
+        print("{}(*{}) -> {}".format(name, input.decode("utf-8"),
+                                     output.decode("utf-8")))
+
+
+def count_calls(method: Callable) -> Callable:
+    """Decorator to count how many times a method is called."""
+
+    @wraps(method)
+    def wrapper(self, *args, **kwargs):
+        key = method.__qualname__
+        self._redis.incr(key)
+        return method(self, *args, **kwargs)
+
+    return wrapper
+
+def call_history(method: Callable) -> Callable:
+    '''
+        stores the history of inputs and outputs for a particular function
+    '''
+    key: str = method.__qualname__
+    inputs = key + ":inputs"
+    outputs = key + ":outputs"
+
+    @wraps(method)
+    def wrapper(self, *args, **kwargs):  # sourcery skip: avoid-builtin-shadow
+        """ Wrapper for decorator functionality """
+        self._redis.rpush(inputs, str(args))
+        data = method(self, *args, **kwargs)
+        self._redis.rpush(outputs, str(data))
+        return data
+
+    return wrapper
 
 class Cache:
     """A class to manage caching using Redis."""
@@ -66,19 +109,3 @@ class Cache:
         """
         return self.get(key, fn=int)
 
-
-cache = Cache()
-
-TEST_CASES = {
-    b"foo": None,
-    123: int,
-    "bar": lambda d: d.decode("utf-8")
-}
-
-for value, fn in TEST_CASES.items():
-    key = cache.store(value)
-    assert cache.get(key, fn=fn) == value
-    if fn == str:
-        assert cache.get_str(key) == value
-    elif fn == int:
-        assert cache.get_int(key) == value
